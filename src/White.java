@@ -4,28 +4,39 @@ import java.awt.*;
 import javax.swing.*;
 public class White extends JApplet{
 	public static double scalar;
+	public static double diffX;
+	public static double diffY;
+	public static double mapWidth, mapHeight;
 	public static Region[] regions;
 	
-	
 	public void init() {
-		System.out.println("init works");
-		//Scanner sc = new Scanner (System.in);
-		//String input = sc.nextLine();
-		//String file = input + ".txt";
-		String file = "USA" + ".txt";
+		Scanner sc = new Scanner (System.in);
+		String input = sc.nextLine();
+		String file = input + ".txt";
+		sc.close();
+		//String file = "USA" + ".txt";
 		parseData(file);
+		repaint();
 	}
 	
 	public void scale(ArrayList<Double> list){
-		int height = 1000;//this.getHeight();
-		int width = 1000;//this.getWidth();
-		double mapHeight = Math.abs(list.get(1)-list.get(3));
-		double mapWidth = Math.abs(list.get(0)-list.get(2));
-		if (height>=width){
+		int height = getHeight();
+		int width = getWidth();
+		mapHeight = Math.abs(list.get(1)-list.get(3));
+		mapWidth = Math.abs(list.get(0)-list.get(2));
+		diffX = -1*list.get(0);
+		diffY = -1*list.get(1);
+		if (mapWidth >= mapHeight){
 			scalar = width/mapWidth;
 		} else {
 			scalar = height/mapHeight;
 		}
+	}
+	public double scaleX(double point){
+		return getWidth()/2-scalar*mapWidth/2+scalar*point;
+	}
+	public double scaleY(double point){
+		return getHeight()/2+scalar*mapHeight/2-scalar*point;
 	}
 	
 	public class Region {
@@ -33,8 +44,7 @@ public class White extends JApplet{
 		Polygon shape;
 		ArrayList<Double> xPointList = new ArrayList<Double>();
 		ArrayList<Double> yPointList = new ArrayList<Double>();;
-		int[] xPoints;
-		int[] yPoints;
+
 		
 		public Region(String name){
 			regionName = name;
@@ -52,19 +62,18 @@ public class White extends JApplet{
 			yPointList.add(d);
 		}
 		public void makeRegion(){
-			xPoints = new int[xPointList.size()];
-			yPoints = new int[yPointList.size()];
+			int[] xPoints = new int[xPointList.size()];
+			int[] yPoints = new int[yPointList.size()];
 			for (int i=0; i < xPoints.length; i++){
-				xPoints[i]=(int)(scalar*xPointList.get(i));
-				yPoints[i]=(int)(scalar*yPointList.get(i));
+				xPoints[i]=(int)(scaleX(xPointList.get(i)+diffX));
+				yPoints[i]=(int)(scaleY(yPointList.get(i)+diffY));
 			}
 			shape = new Polygon(xPoints, yPoints, xPoints.length);
 		}
 	}
 	
 	public void parseData(String fileName){
-		System.out.println("parse data works");
-		
+
 		ArrayList<Double> boundNums = new ArrayList<Double>();
 		int currentRegion = 0;
 		int counter = 0;
@@ -109,9 +118,7 @@ public class White extends JApplet{
             	
             }
             
-            for (int i = 0; i < regions.length; i++) {
-            	System.out.println(regions[i].getName());
-            }
+            
             scanner.close();
         }
         catch(FileNotFoundException ex) {
@@ -122,9 +129,15 @@ public class White extends JApplet{
 	}
 	
 	public void paint(Graphics g){
-		for (int i = 0; i < regions.length; i++) {
-			g.drawPolygon(regions[i].getShape());
+		Region[] reg2 = new Region[regions.length];
+        for (int i = 0; i < regions.length; i++) {
+        	reg2[i] = new Region(regions[i].getName());
+        	reg2[i].shape = regions[i].getShape();
+        }
+		for (int i = 0; i < reg2.length; i++) {
+			g.drawPolygon(reg2[i].getShape());
 		}
+
 	}
 
 }
