@@ -118,7 +118,6 @@ public class White extends JApplet{
             	
             }
             
-            
             scanner.close();
         }
         catch(FileNotFoundException ex) {
