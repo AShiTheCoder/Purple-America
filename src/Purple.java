@@ -50,7 +50,7 @@ public class Purple extends JApplet{
 		Polygon shape;
 		Color c;
 		ArrayList<Double> xPointList = new ArrayList<Double>();
-		ArrayList<Double> yPointList = new ArrayList<Double>();;
+		ArrayList<Double> yPointList = new ArrayList<Double>();
 		
 		public Region(String name){
 			regionName = name;
